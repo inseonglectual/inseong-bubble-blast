@@ -258,12 +258,11 @@ window.onload = function() {
     function main(tframe) {
         // Request animation frames
         window.requestAnimationFrame(main);
-        // if ( Date.now()<releaseDate){
-        //     context.clearRect(0, 0, canvas.width, canvas.height);
-        //     context.drawImage(preview,0,0,600,770);
+        if ( Date.now()<releaseDate){
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.drawImage(preview,0,0,600,770);
            
-        // } else 
-        if (!initialized) {
+        } else if (!initialized) {
             // Preloader
             
             // Clear the canvas
