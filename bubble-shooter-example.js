@@ -102,6 +102,7 @@ window.onload = function() {
     // Game states
     var gamestates = { init: 0, ready: 1, shootbubble: 2, removecluster: 3, gameover: 4, win: 5};
     var gamestate = gamestates.init;
+    var playable = true;
     
     // Score
     var score = 0;
@@ -124,6 +125,11 @@ window.onload = function() {
     var bubbleimage;
     var buttonsImage;
     var wheelimage;
+    var actualwheel;
+    var frame;
+    var preview;
+    var locked;
+    
 
     //MouseDownStates
     var mousedownright;
@@ -135,6 +141,8 @@ window.onload = function() {
     var loadcount = 0;
     var loadtotal = 0;
     var preloaded = false;
+
+    var unlockIndex = 2;
     
     // Load images
     function loadImages(imagefiles) {
@@ -172,13 +180,14 @@ window.onload = function() {
     // Initialize the game
     function init() {
         // Load images
-        images = loadImages(["inseong-bubble-sprites.png", "buttons.png","inseong-sprites.png", "wheel.png","frame.png","old-start-preview.png"]);
+        images = loadImages(["inseong-bubble-sprites.png", "buttons.png","inseong-sprites.png", "wheel.png","frame.png","old-start-preview.png","locked.png"]);
         bubbleimage = images[0];
         buttonsImage = images[1];
         wheelimage = images[2];
         actualwheel = images[3];
         frame = images[4];
         preview = images[5];
+        locked = images[6];
     
         // Add mouse events
         canvas.addEventListener("mousemove", onMouseMove);
@@ -250,7 +259,7 @@ window.onload = function() {
     function main(tframe) {
         // Request animation frames
         window.requestAnimationFrame(main);
-        if ( Date.now()<releaseDate){
+        if ( Date.now()<releaseDate && playable == false){
             context.clearRect(0, 0, canvas.width, canvas.height);
             context.drawImage(preview,0,0,600,770);
            
@@ -475,6 +484,13 @@ window.onload = function() {
                     setGameState(gamestates.win);
                 }
             }
+            if (score > 450) {
+                unlockIndex = 8;
+            } else if (score > 300) {
+                unlockIndex = 6;
+            } else if (score > 150) {
+                unlockIndex = 4;
+            }
         }
     }
     
@@ -533,18 +549,18 @@ window.onload = function() {
             //TODO: special tile function here
             //all touching: call GetNeighbors();
             if (player.bubble.tiletype == 7){
-                for (var i=0;i<level.columns;i++){
-                    if (level.tiles[i][gridpos.y].type>=0){
-                        cluster.push(level.tiles[i][gridpos.y]);
-                    }
-                }
-            } else if (player.bubble.tiletype == 8){
                 if (intersectx != -1){
                     level.tiles[gridpos.x][gridpos.y].type = level.tiles[intersectx][intersecty].type
                     cluster = findCluster(gridpos.x, gridpos.y, true, true, false);
                 }
                 else {
                     level.tiles[gridpos.x][gridpos.y].type =  getExistingColor();
+                }
+            } else if (player.bubble.tiletype == 8){
+                for (var i=0;i<level.columns;i++){
+                    if (level.tiles[i][gridpos.y].type>=0){
+                        cluster.push(level.tiles[i][gridpos.y]);
+                    }
                 }
             } else if (player.bubble.tiletype == 9){
                 if (intersectx != -1){
@@ -553,7 +569,19 @@ window.onload = function() {
                     level.tiles[gridpos.x][gridpos.y].type = getExistingColor();
                 }
             } else if (player.bubble.tiletype == 10){
-                if (intersectx != -1){
+                neighbors = getNeighbors(level.tiles[gridpos.x][gridpos.y]);
+                newcolor = getExistingColor();
+                level.tiles[gridpos.x][gridpos.y].type = newcolor;
+                for (var i=0; i<neighbors.length; i++) {
+                    if (neighbors[i].type != -1){
+                        neighbors[i].type = newcolor;
+                    }
+                }
+                cluster = findCluster(gridpos.x, gridpos.y, true, true, false);
+            } else if(player.bubble.tiletype == 11) {
+                cluster = getNeighbors(level.tiles[gridpos.x][gridpos.y]);
+            } else if(player.bubble.tiletype == 12) {
+                 if (intersectx != -1){
                     removedcolor = level.tiles[intersectx][intersecty].type;
                     level.tiles[gridpos.x][gridpos.y].type = removedcolor;
                     for (var i=0; i<level.columns; i++) {
@@ -567,18 +595,6 @@ window.onload = function() {
                 else {
                     level.tiles[gridpos.x][gridpos.y].type =  getExistingColor();
                 }
-            } else if(player.bubble.tiletype == 11) {
-                cluster = getNeighbors(level.tiles[gridpos.x][gridpos.y]);
-            } else if(player.bubble.tiletype == 12) {
-                neighbors = getNeighbors(level.tiles[gridpos.x][gridpos.y]);
-                newcolor = getExistingColor();
-                level.tiles[gridpos.x][gridpos.y].type = newcolor;
-                for (var i=0; i<neighbors.length; i++) {
-                    if (neighbors[i].type != -1){
-                        neighbors[i].type = newcolor;
-                    }
-                }
-                cluster = findCluster(gridpos.x, gridpos.y, true, true, false);
             } else if (player.bubble.tiletype == 13){
                 for (var i=0; i<level.columns; i++) {
                     for (var j=2; j<level.rows-1; j++) {
@@ -598,7 +614,7 @@ window.onload = function() {
                 cluster = findCluster(gridpos.x, gridpos.y, true, true, false);
             }
              
-            if (cluster.length >= 3 || player.bubble.tiletype == 7 || player.bubble.tiletype == 9 || player.bubble.tiletype == 10 || player.bubble.tiletype == 11 || player.bubble.tiletype == 12 || player.bubble.tiletype == 13 || player.bubble.tiletype == 14) {
+            if (cluster.length >= 3 || player.bubble.tiletype == 8 || player.bubble.tiletype == 9 || player.bubble.tiletype == 10 || player.bubble.tiletype == 11 || player.bubble.tiletype == 12 || player.bubble.tiletype == 13 || player.bubble.tiletype == 14) {
                 // Remove the cluster
                 setGameState(gamestates.removecluster);
                 return;
@@ -836,6 +852,10 @@ window.onload = function() {
     function render() {
         // Draw the frame around the game
         drawFrame();
+        for (var i=unlockIndex;i<8;i++){
+            var playerposition = playerButtons[i];
+            context.drawImage(locked,playerposition.x, playerposition.y, playerposition.width, playerposition.height);
+        }
         
         var yoffset =  level.tileheight/2;
         
@@ -1271,7 +1291,7 @@ window.onload = function() {
             }
             setGameState(gamestates.ready)
         }
-        for (var i=0;i<8;i++){
+        for (var i=0;i<unlockIndex;i++){
             if (isInside(pos,playerButtons[i])){
                 player.selectedSprite = i;
             }
