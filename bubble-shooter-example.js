@@ -124,6 +124,11 @@ window.onload = function() {
     var bubbleimage;
     var buttonsImage;
     var wheelimage;
+    var actualwheel;
+    var frame;
+    var preview;
+    var locked;
+    
 
     //MouseDownStates
     var mousedownright;
@@ -135,6 +140,8 @@ window.onload = function() {
     var loadcount = 0;
     var loadtotal = 0;
     var preloaded = false;
+
+    var unlockIndex = 2;
     
     // Load images
     function loadImages(imagefiles) {
@@ -172,13 +179,14 @@ window.onload = function() {
     // Initialize the game
     function init() {
         // Load images
-        images = loadImages(["inseong-bubble-sprites.png", "buttons.png","inseong-sprites.png", "wheel.png","frame.png","old-start-preview.png"]);
+        images = loadImages(["inseong-bubble-sprites.png", "buttons.png","inseong-sprites.png", "wheel.png","frame.png","old-start-preview.png","jasonk.png"]);
         bubbleimage = images[0];
         buttonsImage = images[1];
         wheelimage = images[2];
         actualwheel = images[3];
         frame = images[4];
         preview = images[5];
+        locked = images[6];
     
         // Add mouse events
         canvas.addEventListener("mousemove", onMouseMove);
@@ -474,6 +482,13 @@ window.onload = function() {
                     // No tiles left, game over
                     setGameState(gamestates.win);
                 }
+            }
+            if (score > 450) {
+                unlockIndex = 8;
+            } else if (score > 300) {
+                unlockIndex = 6;
+            } else if (score > 150) {
+                unlockIndex = 4;
             }
         }
     }
@@ -836,6 +851,10 @@ window.onload = function() {
     function render() {
         // Draw the frame around the game
         drawFrame();
+        for (var i=unlockIndex;i<8;i++){
+            var playerposition = playerButtons[i];
+            context.drawImage(locked,playerposition.x, playerposition.y, playerposition.width, playerposition.height);
+        }
         
         var yoffset =  level.tileheight/2;
         
@@ -1271,7 +1290,7 @@ window.onload = function() {
             }
             setGameState(gamestates.ready)
         }
-        for (var i=0;i<8;i++){
+        for (var i=0;i<unlockIndex;i++){
             if (isInside(pos,playerButtons[i])){
                 player.selectedSprite = i;
             }
