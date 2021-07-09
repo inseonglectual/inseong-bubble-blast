@@ -102,7 +102,7 @@ window.onload = function() {
     // Game states
     var gamestates = { init: 0, ready: 1, shootbubble: 2, removecluster: 3, gameover: 4, win: 5};
     var gamestate = gamestates.init;
-    var playable = true;
+    var playable = false;
     
     // Score
     var score = 0;
@@ -854,7 +854,7 @@ window.onload = function() {
         drawFrame();
         for (var i=unlockIndex;i<8;i++){
             var playerposition = playerButtons[i];
-            context.drawImage(locked,playerposition.x, playerposition.y, playerposition.width, playerposition.height);
+            context.drawImage(locked,playerposition.x, playerposition.y-5, playerposition.width, playerposition.height);
         }
         
         var yoffset =  level.tileheight/2;
