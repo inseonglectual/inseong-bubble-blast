@@ -180,7 +180,7 @@ window.onload = function() {
     // Initialize the game
     function init() {
         // Load images
-        images = loadImages(["inseong-bubble-sprites.png", "buttons.png","inseong-sprites.png", "wheel.png","frame.png","old-start-preview.png","locked.png"]);
+        images = loadImages(["inseong-bubble-sprites.png", "buttons.png","inseong-sprites.png", "wheel.png","frame.png","arcade-machine-preview.png","locked.png", "arcade-machine.png", "background.png"]);
         bubbleimage = images[0];
         buttonsImage = images[1];
         wheelimage = images[2];
@@ -188,6 +188,8 @@ window.onload = function() {
         frame = images[4];
         preview = images[5];
         locked = images[6];
+        arcadeMachine = images[7];
+        background = images[8];
     
         // Add mouse events
         canvas.addEventListener("mousemove", onMouseMove);
@@ -260,8 +262,14 @@ window.onload = function() {
         // Request animation frames
         window.requestAnimationFrame(main);
         if ( Date.now()<releaseDate && playable == false){
-            context.clearRect(0, 0, canvas.width, canvas.height);
-            context.drawImage(preview,0,0,600,770);
+            context.clearRect(0, 0, window.innerWidth,window.innerHeight);
+            document.body.style.backgroundColor = "transparent";
+            document.body.style.backgroundImage = "url('background.png')";
+            canvas.height = document.documentElement.clientHeight;
+            canvas.width = document.documentElement.clientWidth;
+            machineWidth = 0.675*document.documentElement.clientHeight;
+            context.drawImage(preview,(document.documentElement.clientWidth/2)-(machineWidth/2),0,machineWidth,document.documentElement.clientHeight)
+
            
         } else if (!initialized) {
             // Preloader
