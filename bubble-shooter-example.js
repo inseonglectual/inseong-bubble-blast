@@ -549,18 +549,18 @@ window.onload = function() {
             //TODO: special tile function here
             //all touching: call GetNeighbors();
             if (player.bubble.tiletype == 7){
-                for (var i=0;i<level.columns;i++){
-                    if (level.tiles[i][gridpos.y].type>=0){
-                        cluster.push(level.tiles[i][gridpos.y]);
-                    }
-                }
-            } else if (player.bubble.tiletype == 8){
                 if (intersectx != -1){
                     level.tiles[gridpos.x][gridpos.y].type = level.tiles[intersectx][intersecty].type
                     cluster = findCluster(gridpos.x, gridpos.y, true, true, false);
                 }
                 else {
                     level.tiles[gridpos.x][gridpos.y].type =  getExistingColor();
+                }
+            } else if (player.bubble.tiletype == 8){
+                for (var i=0;i<level.columns;i++){
+                    if (level.tiles[i][gridpos.y].type>=0){
+                        cluster.push(level.tiles[i][gridpos.y]);
+                    }
                 }
             } else if (player.bubble.tiletype == 9){
                 if (intersectx != -1){
@@ -569,7 +569,19 @@ window.onload = function() {
                     level.tiles[gridpos.x][gridpos.y].type = getExistingColor();
                 }
             } else if (player.bubble.tiletype == 10){
-                if (intersectx != -1){
+                neighbors = getNeighbors(level.tiles[gridpos.x][gridpos.y]);
+                newcolor = getExistingColor();
+                level.tiles[gridpos.x][gridpos.y].type = newcolor;
+                for (var i=0; i<neighbors.length; i++) {
+                    if (neighbors[i].type != -1){
+                        neighbors[i].type = newcolor;
+                    }
+                }
+                cluster = findCluster(gridpos.x, gridpos.y, true, true, false);
+            } else if(player.bubble.tiletype == 11) {
+                cluster = getNeighbors(level.tiles[gridpos.x][gridpos.y]);
+            } else if(player.bubble.tiletype == 12) {
+                 if (intersectx != -1){
                     removedcolor = level.tiles[intersectx][intersecty].type;
                     level.tiles[gridpos.x][gridpos.y].type = removedcolor;
                     for (var i=0; i<level.columns; i++) {
@@ -583,18 +595,6 @@ window.onload = function() {
                 else {
                     level.tiles[gridpos.x][gridpos.y].type =  getExistingColor();
                 }
-            } else if(player.bubble.tiletype == 11) {
-                cluster = getNeighbors(level.tiles[gridpos.x][gridpos.y]);
-            } else if(player.bubble.tiletype == 12) {
-                neighbors = getNeighbors(level.tiles[gridpos.x][gridpos.y]);
-                newcolor = getExistingColor();
-                level.tiles[gridpos.x][gridpos.y].type = newcolor;
-                for (var i=0; i<neighbors.length; i++) {
-                    if (neighbors[i].type != -1){
-                        neighbors[i].type = newcolor;
-                    }
-                }
-                cluster = findCluster(gridpos.x, gridpos.y, true, true, false);
             } else if (player.bubble.tiletype == 13){
                 for (var i=0; i<level.columns; i++) {
                     for (var j=2; j<level.rows-1; j++) {
@@ -614,7 +614,7 @@ window.onload = function() {
                 cluster = findCluster(gridpos.x, gridpos.y, true, true, false);
             }
              
-            if (cluster.length >= 3 || player.bubble.tiletype == 7 || player.bubble.tiletype == 9 || player.bubble.tiletype == 10 || player.bubble.tiletype == 11 || player.bubble.tiletype == 12 || player.bubble.tiletype == 13 || player.bubble.tiletype == 14) {
+            if (cluster.length >= 3 || player.bubble.tiletype == 8 || player.bubble.tiletype == 9 || player.bubble.tiletype == 10 || player.bubble.tiletype == 11 || player.bubble.tiletype == 12 || player.bubble.tiletype == 13 || player.bubble.tiletype == 14) {
                 // Remove the cluster
                 setGameState(gamestates.removecluster);
                 return;
