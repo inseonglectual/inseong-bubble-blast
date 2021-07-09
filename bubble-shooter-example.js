@@ -267,7 +267,7 @@ window.onload = function() {
             document.body.style.backgroundImage = "url('background.png')";
             canvas.height = document.documentElement.clientHeight;
             canvas.width = document.documentElement.clientWidth;
-            machineWidth = 0.675*document.documentElement.clientHeight;
+            machineWidth = 0.675*(document.documentElement.clientHeight*0.85);
             context.drawImage(preview,(document.documentElement.clientWidth/2)-(machineWidth/2),0,machineWidth,document.documentElement.clientHeight)
 
            
