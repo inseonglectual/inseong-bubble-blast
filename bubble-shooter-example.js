@@ -99,7 +99,7 @@ window.onload = function() {
 
     
     // Game states
-    var gamestates = { init: 0, ready: 1, shootbubble: 2, removecluster: 3, gameover: 4 };
+    var gamestates = { init: 0, ready: 1, shootbubble: 2, removecluster: 3, gameover: 4, win: 5};
     var gamestate = gamestates.init;
     
     // Score
@@ -374,7 +374,7 @@ window.onload = function() {
             }
             
             // Add cluster score
-            score += cluster.length * 100;
+            score += cluster.length * 4;
             
             // Find floating clusters
             floatingclusters = findFloatingClusters();
@@ -388,7 +388,7 @@ window.onload = function() {
                         tile.shift = 1;
                         tile.velocity = player.bubble.dropspeed;
                         
-                        score += 100;
+                        score += 4;
                     }
                 }
             }
@@ -461,12 +461,13 @@ window.onload = function() {
                         }
                     }
                 }
-                
-                if (tilefound) {
+                if (score >= 712) {
+                    setGameState(gamestates.win);
+                } else if (tilefound) {
                     setGameState(gamestates.ready);
                 } else {
                     // No tiles left, game over
-                    setGameState(gamestates.gameover);
+                    setGameState(gamestates.win);
                 }
             }
         }
@@ -579,14 +580,20 @@ window.onload = function() {
                         level.tiles[i][j-2].type = level.tiles[i][j].type;
                     }
                 }
-                cluster = [level.tiles[gridpos.x][gridpos.y-2]]
+                if ((gridpos.y)>2) {
+                    cluster = [level.tiles[gridpos.x][gridpos.y-2]]
+                } else {
+                    setGameState(gamestates.win);
+                }
+            } else if (player.bubble.tiletype == 14){
+                cluster = [level.tiles[gridpos.x][gridpos.y]]
             }
             else {
             // Find clusters
                 cluster = findCluster(gridpos.x, gridpos.y, true, true, false);
             }
              
-            if (cluster.length >= 3 || player.bubble.tiletype == 7 || player.bubble.tiletype == 9 || player.bubble.tiletype == 10 || player.bubble.tiletype == 11 || player.bubble.tiletype == 12 || player.bubble.tiletype == 13) {
+            if (cluster.length >= 3 || player.bubble.tiletype == 7 || player.bubble.tiletype == 9 || player.bubble.tiletype == 10 || player.bubble.tiletype == 11 || player.bubble.tiletype == 12 || player.bubble.tiletype == 13 || player.bubble.tiletype == 14) {
                 // Remove the cluster
                 setGameState(gamestates.removecluster);
                 return;
@@ -595,7 +602,7 @@ window.onload = function() {
         
         // No clusters found
         turncounter++;
-        if (turncounter >= 5) {
+        if (turncounter >= 4) {
             // Add a row of bubbles
             addBubbles();
             turncounter = 0;
@@ -873,6 +880,14 @@ window.onload = function() {
             context.font = "24px Verdana";
             drawCenterText("Game Over!", level.x, level.y + level.height / 2 + 10, level.width);
             drawCenterText("Click to start", level.x, level.y + level.height / 2 + 40, level.width);
+        } else if (gamestate == gamestates.win) {
+            context.fillStyle = "rgba(0, 0, 0, 0.8)";
+            context.fillRect(level.x - 4, level.y - 4, level.width + 8, level.height + 2 * level.tileheight + 8 - yoffset);
+            
+            context.fillStyle = "#ffffff";
+            context.font = "24px Verdana";
+            drawCenterText("You've won!", level.x, level.y + level.height / 2 + 10, level.width);
+            drawCenterText("Click to start over", level.x, level.y + level.height / 2 + 40, level.width);
         }
     }
     
