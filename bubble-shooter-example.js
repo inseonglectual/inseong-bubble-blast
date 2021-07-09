@@ -36,6 +36,7 @@ window.onload = function() {
     var framecount = 0;
     var fps = 0;
     
+    var releaseDate = Date.parse('2021-07-12T00:00:00+09:00');
     var initialized = false;
     
     // Level
@@ -171,12 +172,13 @@ window.onload = function() {
     // Initialize the game
     function init() {
         // Load images
-        images = loadImages(["inseong-bubble-sprites.png", "buttons.png","inseong-sprites.png","frame.png", "wheel.png"]);
+        images = loadImages(["inseong-bubble-sprites.png", "buttons.png","inseong-sprites.png", "wheel.png","frame.png","old-start-preview.png"]);
         bubbleimage = images[0];
         buttonsImage = images[1];
         wheelimage = images[2];
-        frame = images[3];
-        actualwheel = images[4];
+        actualwheel = images[3];
+        frame = images[4];
+        preview = images[5];
     
         // Add mouse events
         canvas.addEventListener("mousemove", onMouseMove);
@@ -248,8 +250,11 @@ window.onload = function() {
     function main(tframe) {
         // Request animation frames
         window.requestAnimationFrame(main);
-    
-        if (!initialized) {
+        if ( Date.now()<releaseDate){
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.drawImage(preview,0,0,600,770);
+           
+        } else if (!initialized) {
             // Preloader
             
             // Clear the canvas
@@ -1315,5 +1320,11 @@ window.onload = function() {
         ctx.restore();
     };
     // Call init to start the game
-    init();
+ //   if (Date.now() > releaseDate){
+        init();
+   // }
+   // else{
+   //     frame = loadImages(["frame.png"])[0]
+   //     drawFrame();
+   // }
 };
