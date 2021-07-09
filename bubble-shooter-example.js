@@ -179,7 +179,7 @@ window.onload = function() {
     // Initialize the game
     function init() {
         // Load images
-        images = loadImages(["inseong-bubble-sprites.png", "buttons.png","inseong-sprites.png", "wheel.png","frame.png","old-start-preview.png","jasonk.png"]);
+        images = loadImages(["inseong-bubble-sprites.png", "buttons.png","inseong-sprites.png", "wheel.png","frame.png","old-start-preview.png","locked.png"]);
         bubbleimage = images[0];
         buttonsImage = images[1];
         wheelimage = images[2];
@@ -258,11 +258,12 @@ window.onload = function() {
     function main(tframe) {
         // Request animation frames
         window.requestAnimationFrame(main);
-        if ( Date.now()<releaseDate){
-            context.clearRect(0, 0, canvas.width, canvas.height);
-            context.drawImage(preview,0,0,600,770);
+        // if ( Date.now()<releaseDate){
+        //     context.clearRect(0, 0, canvas.width, canvas.height);
+        //     context.drawImage(preview,0,0,600,770);
            
-        } else if (!initialized) {
+        // } else 
+        if (!initialized) {
             // Preloader
             
             // Clear the canvas
