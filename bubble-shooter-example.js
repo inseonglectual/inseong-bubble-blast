@@ -580,7 +580,7 @@ window.onload = function() {
                         level.tiles[i][j-2].type = level.tiles[i][j].type;
                     }
                 }
-                if ((gridpos.y)>2) {
+                if ((gridpos.y)>=2) {
                     cluster = [level.tiles[gridpos.x][gridpos.y-2]]
                 } else {
                     setGameState(gamestates.win);
@@ -887,7 +887,7 @@ window.onload = function() {
             context.fillStyle = "#ffffff";
             context.font = "24px Verdana";
             drawCenterText("You've won!", level.x, level.y + level.height / 2 + 10, level.width);
-            drawCenterText("Click to start over", level.x, level.y + level.height / 2 + 40, level.width);
+            drawCenterText("Click to continue!", level.x, level.y + level.height / 2 + 40, level.width);
         }
     }
     
@@ -1250,6 +1250,21 @@ window.onload = function() {
         	//player.angle = Math.max(8, player.angle-2);
         } else if (gamestate == gamestates.gameover) {
             newGame();
+        } else if (gamestate == gamestates.win) {
+            var tilefound = false
+            for (var i=0; i<level.columns; i++) {
+                for (var j=0; j<level.rows; j++) {
+                    if (level.tiles[i][j].type != -1) {
+                        tilefound = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!tilefound) {
+                createLevel();
+            }
+            setGameState(gamestates.ready)
         }
         for (var i=0;i<8;i++){
             if (isInside(pos,playerButtons[i])){
