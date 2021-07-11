@@ -262,7 +262,6 @@ window.onload = function() {
     
     // Main loop
     function main(tframe) {
-        console.log(gamestate);
         // Request animation frames
         window.requestAnimationFrame(main);
         if ( Date.now()<releaseDate && playable == false){
@@ -309,7 +308,6 @@ window.onload = function() {
             render();
             }
         if(gamestate == gamestates.startscreen){
-            console.log("start screen");
             canvas.style.display = "none";
             document.body.style.backgroundColor = "transparent";
             document.body.style.backgroundImage = "url('background.png')";
@@ -1106,7 +1104,8 @@ window.onload = function() {
         
         // Set the gamestate to start screen
         setGameState(gamestates.startscreen);
-        
+        startscreen.style.display = "block";
+
         // Create the level
         createLevel();
 
@@ -1275,7 +1274,26 @@ window.onload = function() {
         var pos = getMousePos(canvas, e);
         console.log(pos.x, pos.y);
         console.log(e.clientX,e.clientY)
-        if (isInside(pos,directionButtons["leftButton"])) {
+        if (gamestate == gamestates.gameover) {
+            console.log("calling new game");
+            newGame();
+        } else if (gamestate == gamestates.win) {
+            var tilefound = false
+            for (var i=0; i<level.columns; i++) {
+                for (var j=0; j<level.rows; j++) {
+                    if (level.tiles[i][j].type != -1) {
+                        tilefound = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!tilefound) {
+                createLevel();
+            }
+            setGameState(gamestates.ready)
+        }
+        else if (isInside(pos,directionButtons["leftButton"])) {
             console.log("left")
             mousedownleft = true;
             if (IS_MOBILE) {
@@ -1308,24 +1326,7 @@ window.onload = function() {
                 };
             }
         	//player.angle = Math.max(8, player.angle-2);
-        } else if (gamestate == gamestates.gameover) {
-            newGame();
-        } else if (gamestate == gamestates.win) {
-            var tilefound = false
-            for (var i=0; i<level.columns; i++) {
-                for (var j=0; j<level.rows; j++) {
-                    if (level.tiles[i][j].type != -1) {
-                        tilefound = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!tilefound) {
-                createLevel();
-            }
-            setGameState(gamestates.ready)
-        }
+        } 
         for (var i=0;i<unlockIndex;i++){
             if (isInside(pos,playerButtons[i])){
                 player.selectedSprite = i;
