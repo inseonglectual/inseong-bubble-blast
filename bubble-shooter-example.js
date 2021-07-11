@@ -24,6 +24,9 @@ window.onload = function() {
     var startscreen = document.getElementById("startscreen");
     var startscreencontext = startscreen.getContext("2d");
     var canvas = document.getElementById("viewport");
+    var gifs = document.getElementsByClassName("gif");
+    var endscreen = document.getElementById("endscreen");
+    var gifnum = 0;
     var context = canvas.getContext("2d");
     var IS_IOS = /iPad|iPhone|iPod/.test(window.navigator.platform);
     var IS_MOBILE = /Android/.test(window.navigator.userAgent) || IS_IOS;
@@ -40,6 +43,7 @@ window.onload = function() {
     
     var releaseDate = Date.parse('2021-07-12T00:00:00+09:00');
     var initialized = false;
+    var winThreshold = 712
     
     // Level
     var level = {
@@ -102,9 +106,9 @@ window.onload = function() {
 
     
     // Game states
-    var gamestates = { init: 0, ready: 1, shootbubble: 2, removecluster: 3, gameover: 4, win: 5, startscreen: 6};
+    var gamestates = { init: 0, ready: 1, shootbubble: 2, removecluster: 3, gameover: 4, win: 5, startscreen: 6, displaygif: 7};
     var gamestate = gamestates.startscreen;
-    var playable = false;
+    var playable = true;
     
     // Score
     var score = 0;
@@ -200,6 +204,11 @@ window.onload = function() {
         canvas.addEventListener("touchend", onTouchEnd);
         canvas.addEventListener("mouseup", onMouseUp);
         startscreen.addEventListener("mousedown", onStartScreenMousedown);
+        for (var i=0; i<5; i++){
+            gifs[i].addEventListener("mousedown", onGifMouseDown)
+        }
+        endscreen.addEventListener("mousedown", onMouseDown);
+        
         
         // Initialize the two-dimensional tile array
         for (var i=0; i<level.columns; i++) {
@@ -497,8 +506,9 @@ window.onload = function() {
                         }
                     }
                 }
-                if (score >= 712) {
+                if (score >= winThreshold) {
                     setGameState(gamestates.win);
+                    winThreshold = 999999;
                 } else if (tilefound) {
                     setGameState(gamestates.ready);
                 } else {
@@ -629,7 +639,15 @@ window.onload = function() {
                     setGameState(gamestates.win);
                 }
             } else if (player.bubble.tiletype == 14){
-                cluster = [level.tiles[gridpos.x][gridpos.y]]
+                gifs[gifnum].style.display = 'inline-block';
+                giftag = gifs[gifnum].getElementsByTagName('img')[0];
+                gifs[gifnum].style.top = document.documentElement.clientHeight/2 - giftag.height/2;
+                wid = document.documentElement.clientWidth/2 - giftag.width/2;
+                gifs[gifnum].style.left = `${wid}px`;
+                
+                cluster = [level.tiles[gridpos.x][gridpos.y]];
+                setGameState(gamestates.displaygif);
+                return;
             }
             else {
             // Find clusters
@@ -928,13 +946,11 @@ window.onload = function() {
             drawCenterText("Game Over!", level.x, level.y + level.height / 2 + 10, level.width);
             drawCenterText("Click to start", level.x, level.y + level.height / 2 + 40, level.width);
         } else if (gamestate == gamestates.win) {
-            context.fillStyle = "rgba(0, 0, 0, 0.8)";
-            context.fillRect(level.x - 4, level.y - 4, level.width + 8, level.height + 2 * level.tileheight + 8 - yoffset);
-            
-            context.fillStyle = "#ffffff";
-            context.font = "24px Verdana";
-            drawCenterText("You've won!", level.x, level.y + level.height / 2 + 10, level.width);
-            drawCenterText("Click to continue!", level.x, level.y + level.height / 2 + 40, level.width);
+            endscreen.style.display = 'inline-block';
+            endscreentag = endscreen.getElementsByTagName('img')[0];
+            endscreen.style.top = document.documentElement.clientHeight/2 - endscreentag.height/2;
+            wid = document.documentElement.clientWidth/2 - endscreentag.width/2;
+            endscreen.style.left = `${wid}px`;
         }
     }
     
@@ -1268,6 +1284,13 @@ window.onload = function() {
             canvas.style.display = "block";
         }
     }
+
+    function onGifMouseDown(e) {
+        gifs[gifnum].style.display = 'none';
+        gifnum = (gifnum + 1)%5;
+        setGameState(gamestates.removecluster);
+    }
+
     // On mouse button click
     function onMouseDown(e) {
         // Get the mouse position
@@ -1275,9 +1298,10 @@ window.onload = function() {
         console.log(pos.x, pos.y);
         console.log(e.clientX,e.clientY)
         if (gamestate == gamestates.gameover) {
-            console.log("calling new game");
             newGame();
         } else if (gamestate == gamestates.win) {
+            endscreen.style.display = 'none';
+
             var tilefound = false
             for (var i=0; i<level.columns; i++) {
                 for (var j=0; j<level.rows; j++) {
@@ -1292,6 +1316,10 @@ window.onload = function() {
                 createLevel();
             }
             setGameState(gamestates.ready)
+        } else if (gamestate == gamestates.displaygif){
+            gifs[gifnum].style.display = 'none';
+            gifnum = (gifnum + 1)%5;
+            setGameState(gamestates.removecluster);
         }
         else if (isInside(pos,directionButtons["leftButton"])) {
             console.log("left")
