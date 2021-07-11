@@ -109,7 +109,7 @@ window.onload = function() {
     // Game states
     var gamestates = { init: 0, ready: 1, shootbubble: 2, removecluster: 3, gameover: 4, win: 5, startscreen: 6, displaygif: 7};
     var gamestate = gamestates.startscreen;
-    var playable = true;
+    var playable = false;
     
     // Score
     var score = 0;
