@@ -21,6 +21,8 @@
 // The function gets called when the window is fully loaded
 window.onload = function() {
     // Get the canvas and context
+    var startscreen = document.getElementById("startscreen");
+    var startscreencontext = startscreen.getContext("2d");
     var canvas = document.getElementById("viewport");
     var context = canvas.getContext("2d");
     var IS_IOS = /iPad|iPhone|iPod/.test(window.navigator.platform);
@@ -100,9 +102,9 @@ window.onload = function() {
 
     
     // Game states
-    var gamestates = { init: 0, ready: 1, shootbubble: 2, removecluster: 3, gameover: 4, win: 5};
-    var gamestate = gamestates.init;
-    var playable = false;
+    var gamestates = { init: 0, ready: 1, shootbubble: 2, removecluster: 3, gameover: 4, win: 5, startscreen: 6};
+    var gamestate = gamestates.startscreen;
+    var playable = true;
     
     // Score
     var score = 0;
@@ -197,6 +199,7 @@ window.onload = function() {
         canvas.addEventListener("touchstart", onTouchStart);
         canvas.addEventListener("touchend", onTouchEnd);
         canvas.addEventListener("mouseup", onMouseUp);
+        startscreen.addEventListener("mousedown", onStartScreenMousedown);
         
         // Initialize the two-dimensional tile array
         for (var i=0; i<level.columns; i++) {
@@ -259,6 +262,7 @@ window.onload = function() {
     
     // Main loop
     function main(tframe) {
+        console.log(gamestate);
         // Request animation frames
         window.requestAnimationFrame(main);
         if ( Date.now()<releaseDate && playable == false){
@@ -268,14 +272,14 @@ window.onload = function() {
             canvas.height = document.documentElement.clientHeight;
             canvas.width = document.documentElement.clientWidth;
             machineWidth = 0.675*(document.documentElement.clientHeight*0.85);
-            context.drawImage(preview,(document.documentElement.clientWidth/2)-(machineWidth/2),0,machineWidth,document.documentElement.clientHeight)
+            context.drawImage(preview,(document.documentElement.clientWidth/2)-(machineWidth/2),0,machineWidth,document.documentElement.clientHeight);
+        } else {
 
-           
-        } else if (!initialized) {
+            if (!initialized) {
             // Preloader
             
             // Clear the canvas
-            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.clearRect(0, 0, document.documentElement.clientWidth, document.documentElement.clientWidth);
             
             // Draw the frame
             drawFrame();
@@ -296,12 +300,24 @@ window.onload = function() {
             
             if (preloaded) {
                 // Add a delay for demonstration purposes
-                setTimeout(function(){initialized = true;}, 1000);
+                setTimeout(function(){initialized = true;}, 0);
             }
         } else {
             // Update and render the game
+            context.clearRect(0, 0, document.documentElement.clientWidth, document.documentElement.clientWidth);
             update(tframe);
             render();
+            }
+        if(gamestate == gamestates.startscreen){
+            console.log("start screen");
+            canvas.style.display = "none";
+            document.body.style.backgroundColor = "transparent";
+            document.body.style.backgroundImage = "url('background.png')";
+            startscreen.height = document.documentElement.clientHeight;
+            startscreen.width = document.documentElement.clientWidth;
+            machineWidth = 0.675*(document.documentElement.clientHeight*0.85);
+            startscreencontext.drawImage(arcadeMachine,(document.documentElement.clientWidth/2)-(machineWidth/2),0,machineWidth,document.documentElement.clientHeight);
+        }
         }
     }
     
@@ -926,6 +942,9 @@ window.onload = function() {
     
     // Draw a frame around the game
     function drawFrame() {
+        context.clearRect(0, 0, window.innerWidth,window.innerHeight);
+        document.backgroundColor = "black";
+        document.backgroundImage = "";
     	context.drawImage(frame,0,0,600,770);
     	// Draw new frame
     	// context.fillRect(0, 0, canvas.width, canvas.height);
@@ -1085,8 +1104,8 @@ window.onload = function() {
         turncounter = 0;
         rowoffset = 0;
         
-        // Set the gamestate to ready
-        setGameState(gamestates.ready);
+        // Set the gamestate to start screen
+        setGameState(gamestates.startscreen);
         
         // Create the level
         createLevel();
@@ -1241,6 +1260,14 @@ window.onload = function() {
     function onTouchEnd(e){
         console.log("Touch ended");
         onMouseUp(e);
+    }
+    function onStartScreenMousedown(e) {
+        if(gamestate == gamestates.startscreen){
+            setGameState(gamestates.ready);
+            startscreencontext.clearRect(0,0,document.documentElement.clientWidth,document.documentElement.clientHeight);
+            startscreen.style.display = "none";
+            canvas.style.display = "block";
+        }
     }
     // On mouse button click
     function onMouseDown(e) {
