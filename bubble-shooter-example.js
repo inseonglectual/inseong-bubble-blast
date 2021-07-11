@@ -604,11 +604,12 @@ window.onload = function() {
                 neighbors = getNeighbors(level.tiles[gridpos.x][gridpos.y]);
                 newcolor = getExistingColor();
                 level.tiles[gridpos.x][gridpos.y].type = newcolor;
-                for (var i=0; i<neighbors.length; i++) {
-                    if (neighbors[i].type != -1){
-                        neighbors[i].type = newcolor;
-                    }
-                }
+                //remove changing neighbor color
+                // for (var i=0; i<neighbors.length; i++) {
+                //     if (neighbors[i].type != -1){
+                //         neighbors[i].type = newcolor;
+                //     }
+                // }
                 cluster = findCluster(gridpos.x, gridpos.y, true, true, false);
             } else if(player.bubble.tiletype == 11) {
                 cluster = getNeighbors(level.tiles[gridpos.x][gridpos.y]);
