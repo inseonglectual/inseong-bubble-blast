@@ -22,6 +22,7 @@
         -webkit-tap-highlight-color: transparent;
         padding: 0;
         margin: 0;
+        position:absolute;
     }
     canvas {
     /* handle force touch */
@@ -48,6 +49,14 @@
             width: auto;
             height: 100vh;
         }
+        img {
+            width: auto;
+            height: 40vh;
+        }
+        div {
+            top:20vh;
+            left:35vw;
+        }
     }
 
     @media (orientation: portrait) {
@@ -55,14 +64,30 @@
             width: 98vw;
             height: auto;
         }
+        img {
+            width: 60vw;
+            height: auto;
+        }
+        div {
+            top: 40vw;
+            left: 20vw;
+        }
+    }
+    div {
+        position:relative;
+        display:none;
     }
 </style>
 </head>
 
 <body>
 <canvas id="startscreen"></canvas>
-<canvas id="viewport" width="600" height="770"></canvas></div>
-<table id="selecttable"></table>
+<canvas id="viewport" width="600" height="770"></canvas>
+<div class="gif"><img src="gif1.gif"></div>
+<div class="gif"><img src="gif2.gif"></div>
+<div class="gif"><img src="gif3.gif"></div>
+<div class="gif"><img src="gif4.gif"></div>
+<div class="gif"><img src="gif5.gif"></div>
 </body>
 
 </html> 

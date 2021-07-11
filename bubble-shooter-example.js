@@ -24,6 +24,8 @@ window.onload = function() {
     var startscreen = document.getElementById("startscreen");
     var startscreencontext = startscreen.getContext("2d");
     var canvas = document.getElementById("viewport");
+    var gifs = document.getElementsByClassName("gif");
+    var gifnum = 0;
     var context = canvas.getContext("2d");
     var IS_IOS = /iPad|iPhone|iPod/.test(window.navigator.platform);
     var IS_MOBILE = /Android/.test(window.navigator.userAgent) || IS_IOS;
@@ -102,7 +104,7 @@ window.onload = function() {
 
     
     // Game states
-    var gamestates = { init: 0, ready: 1, shootbubble: 2, removecluster: 3, gameover: 4, win: 5, startscreen: 6};
+    var gamestates = { init: 0, ready: 1, shootbubble: 2, removecluster: 3, gameover: 4, win: 5, startscreen: 6, displaygif: 7};
     var gamestate = gamestates.startscreen;
     var playable = false;
     
@@ -200,6 +202,10 @@ window.onload = function() {
         canvas.addEventListener("touchend", onTouchEnd);
         canvas.addEventListener("mouseup", onMouseUp);
         startscreen.addEventListener("mousedown", onStartScreenMousedown);
+        for (var i=0; i<5; i++){
+            gifs[i].addEventListener("mousedown", onGifMouseDown)
+        }
+        
         
         // Initialize the two-dimensional tile array
         for (var i=0; i<level.columns; i++) {
@@ -631,7 +637,15 @@ window.onload = function() {
                     setGameState(gamestates.win);
                 }
             } else if (player.bubble.tiletype == 14){
-                cluster = [level.tiles[gridpos.x][gridpos.y]]
+                gifs[gifnum].style.display = 'inline-block';
+                giftag = gifs[gifnum].getElementsByTagName('img')[0];
+                gifs[gifnum].style.top = document.documentElement.clientHeight/2 - giftag.height/2;
+                wid = document.documentElement.clientWidth/2 - giftag.height/2;
+                gifs[gifnum].style.left = `${wid}px`;
+                
+                cluster = [level.tiles[gridpos.x][gridpos.y]];
+                setGameState(gamestates.displaygif);
+                return;
             }
             else {
             // Find clusters
@@ -1269,6 +1283,12 @@ window.onload = function() {
             canvas.style.display = "block";
         }
     }
+
+    function onGifMouseDown(e) {
+        gifs[gifnum].style.display = 'none';
+        gifnum = (gifnum + 1)%5;
+        setGameState(gamestates.removecluster);
+    }
     // On mouse button click
     function onMouseDown(e) {
         // Get the mouse position
@@ -1325,6 +1345,10 @@ window.onload = function() {
                 createLevel();
             }
             setGameState(gamestates.ready)
+        } else if (gamestate == gamestates.displaygif){
+            gifs[gifnum].style.display = 'none';
+            gifnum = (gifnum + 1)%5;
+            setGameState(gamestates.removecluster);
         }
         for (var i=0;i<unlockIndex;i++){
             if (isInside(pos,playerButtons[i])){
